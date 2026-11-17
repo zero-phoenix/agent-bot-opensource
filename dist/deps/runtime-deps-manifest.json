@@ -1,0 +1,40 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "required": [
+    "@anysphere/jpeg-napi",
+    "cursor-proclist",
+    "sand-address-lookup",
+    "sand-card-text-recognition",
+    "sand-devicecheck",
+    "sand-notification-settings",
+    "sand-window-capture",
+    "tree-sitter",
+    "tree-sitter-bash"
+  ],
+  "copied": [
+    "@anysphere/jpeg-napi",
+    "cursor-proclist",
+    "node-addon-api",
+    "node-gyp-build",
+    "sand-address-lookup",
+    "sand-card-text-recognition",
+    "sand-devicecheck",
+    "sand-notification-settings",
+    "sand-window-capture",
+    "tree-sitter",
+    "tree-sitter-bash",
+    "web-tree-sitter"
+  ],
+  "nodeFiles": [
+    "@anysphere/jpeg-napi/jpeg-napi.win32-x64-msvc.node",
+    "cursor-proclist/build/Release/cursor_proclist.node",
+    "sand-address-lookup/build/Release/sand_address_lookup.node",
+    "sand-card-text-recognition/build/Release/sand_card_text_recognition.node",
+    "sand-devicecheck/build/Release/sand_devicecheck.node",
+    "sand-notification-settings/build/Release/sand_notification_settings.node",
+    "sand-window-capture/build/Release/sand_window_capture.node",
+    "tree-sitter-bash/prebuilds/win32-x64/tree-sitter-bash.node",
+    "tree-sitter/build/Release/tree_sitter_runtime_binding.node"
+  ]
+}

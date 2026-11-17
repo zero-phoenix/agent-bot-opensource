@@ -1,0 +1,14 @@
+{
+  "name": "sand-notification-settings",
+  "version": "1.0.0",
+  "description": "Native reads of the Sand desktop app's OS notification permission, Windows device-management policy, and macOS trackpad finger lift",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "gypfile": true,
+  "dependencies": {
+    "node-addon-api": "^8.0.0"
+  }
+}

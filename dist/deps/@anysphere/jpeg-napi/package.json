@@ -1,0 +1,42 @@
+{
+  "name": "@anysphere/jpeg-napi",
+  "version": "0.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "jpeg-napi.node",
+    "jpeg-napi.*.node",
+    "package.json"
+  ],
+  "napi": {
+    "binaryName": "jpeg-napi",
+    "targets": [
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-musl",
+      "aarch64-unknown-linux-gnu",
+      "aarch64-unknown-linux-musl",
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc"
+    ]
+  },
+  "devDependencies": {
+    "@vmg-anysphere/napi-rs-cli": "3.2.0-modules.3"
+  },
+  "engines": {
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm",
+    "pnpm": ">= 10.22.0",
+    "node": ">= 18.15.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "build:debug": "napi build --platform",
+    "build:release": "napi build --platform --release",
+    "cargotest": "if [ -z \"$TURBO_HASH\" ]; then turbo run cargotest --output-logs=new-only; else cargo test --features nonapi; fi",
+    "cargolint": "if [ -z \"$TURBO_HASH\" ]; then turbo run cargolint --output-logs=new-only; else EVERYSPHERE_MANUAL_REVIEW_REQUIRED_THIS_LINE_ONLY=1 cargo clippy -- -D clippy::expect_used -D clippy::panic -D clippy::unwrap_used --no-deps; fi",
+    "build-types": "echo noop"
+  }
+}
