@@ -1,0 +1,11 @@
+node_modules/
+vendor-native/
+release/win-unpacked/
+release/*.exe
+release/*.blockmap
+release/*.yml
+release/*.json
+android/build/
+*.local.json
+.env
+.DS_Store

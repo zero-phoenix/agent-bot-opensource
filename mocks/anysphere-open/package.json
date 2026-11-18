@@ -1,0 +1,20 @@
+{
+  "name": "anysphere-open-mock",
+  "version": "1.2.0",
+  "description": "Open-source mock & Tabris/MAGI System Core adapter replacing proprietary @anysphere/* and @sand/* workspace packages",
+  "license": "MIT",
+  "main": "index.cjs",
+  "module": "index.mjs",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.cjs",
+      "default": "./index.cjs"
+    },
+    "./*": {
+      "import": "./index.mjs",
+      "require": "./index.cjs",
+      "default": "./index.cjs"
+    }
+  }
+}

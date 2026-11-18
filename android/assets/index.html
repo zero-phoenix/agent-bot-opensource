@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>agent Bot · OpenSource</title>
+<style>
+  :root {
+    --bg: #090d16;
+    --card: #111827;
+    --card2: #1a2335;
+    --border: #26334d;
+    --accent: #38bdf8;
+    --accent2: #0284c7;
+    --ok: #22c55e;
+    --warn: #f59e0b;
+    --err: #ef4444;
+    --txt: #f1f5f9;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--txt); font: 14px/1.45 system-ui, -apple-system, sans-serif; overflow: hidden; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+
+  header {
+    padding: 12px 14px 10px;
+    background: linear-gradient(180deg, #0f172a 0%, #090d16 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .logo {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; color: #fff; box-shadow: 0 0 14px rgba(56,189,248,0.35);
+  }
+  .brand h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.2px; }
+  .brand small { display: block; font-size: 11px; color: var(--accent); }
+  .pill {
+    font-size: 11px; padding: 4px 9px; border-radius: 999px;
+    background: rgba(34,197,94,0.14); color: #4ade80; border: 1px solid rgba(34,197,94,0.35);
+    white-space: nowrap;
+  }
+
+  nav {
+    display: flex; background: #0c1220; border-bottom: 1px solid var(--border);
+  }
+  nav button {
+    flex: 1; background: none; border: none; color: var(--muted);
+    padding: 10px 6px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  nav button.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(56,189,248,0.06); }
+
+  main { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .hidden { display: none !important; }
+
+  /* Chat */
+  .msg {
+    max-width: 90%; padding: 10px 12px; border-radius: 13px;
+    font-size: 13.5px; white-space: pre-wrap; word-break: break-word;
+  }
+  .msg.user { align-self: flex-end; background: var(--accent2); color: #fff; border-bottom-right-radius: 4px; }
+  .msg.bot { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .meta-tag {
+    margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(148,163,184,0.22);
+    font-size: 10.5px; color: var(--accent); display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .trail-tag { color: var(--warn); }
+
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding: 4px 12px 6px; background: var(--bg); }
+  .chips button {
+    background: var(--card2); color: #cbd5e1; border: 1px solid var(--border);
+    border-radius: 999px; padding: 5px 10px; font-size: 11.5px; white-space: nowrap; cursor: pointer;
+  }
+
+  footer {
+    padding: 8px 10px 12px; background: #0c1220; border-top: 1px solid var(--border);
+    display: flex; gap: 7px; align-items: center;
+  }
+  select#modeSel {
+    background: var(--card); color: var(--accent); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 6px; font-size: 11.5px;
+  }
+  input#chatIn {
+    flex: 1; background: var(--card); color: var(--txt); border: 1px solid var(--border);
+    border-radius: 10px; padding: 9px 11px; font-size: 13.5px; outline: none;
+  }
+  button.primary {
+    background: var(--accent2); color: #fff; border: none; border-radius: 10px;
+    padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  button.warn-btn {
+    background: rgba(245,158,11,0.16); color: #fbbf24; border: 1px solid rgba(245,158,11,0.45);
+    border-radius: 9px; padding: 9px 12px; font-weight: 600; font-size: 12.5px; cursor: pointer;
+  }
+
+  /* Providers Matrix */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+  .stat-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 8px; text-align: center; }
+  .stat-box b { display: block; font-size: 16px; color: var(--accent); }
+  .stat-box span { font-size: 10.5px; color: var(--muted); }
+
+  .prov-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 11px; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .prov-card h4 { font-size: 12.5px; margin-bottom: 2px; }
+  .prov-card p { font-size: 11px; color: var(--muted); }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .badge.READY { background: rgba(34,197,94,0.16); color: #4ade80; }
+  .badge.COOLDOWN_429 { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .badge.OPEN_DOWN, .badge.AUTH_QUOTA_LOCK { background: rgba(239,68,68,0.2); color: #f87171; }
+
+  /* Config Form */
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+  .field label { font-size: 11.5px; color: var(--muted); }
+  .field input {
+    background: var(--card); color: var(--txt); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 10px; font-size: 12.5px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">⚡</div>
+      <div>
+        <h1>agent Bot <span style="font-weight:400;color:#94a3b8;font-size:12px;">v1.2</span></h1>
+        <small id="subStatus">Anillo Multi-Proveedor Anti-429 Activo</small>
+      </div>
+    </div>
+    <div class="pill" id="topBadge">🛡️ Listo</div>
+  </header>
+
+  <nav>
+    <button id="tabBtnChat" class="active" onclick="switchTab('chat')">💬 Agente</button>
+    <button id="tabBtnRot" onclick="switchTab('rot')">🛡️ Rotación (<span id="provCount">0</span>)</button>
+    <button id="tabBtnCfg" onclick="switchTab('cfg')">⚙️ Malla / APIs</button>
+  </nav>
+
+  <!-- TAB 1: CHAT -->
+  <main id="viewChat">
+    <div class="msg bot">👋 <b>agent Bot OpenSource</b> operativo.<br>Conmutación automática ante caídas (5xx/timeout) y límites de cuota (HTTP 429) activada con disyuntor por proveedor.</div>
+  </main>
+
+  <div class="chips" id="quickChips">
+    <button onclick="quickAsk('Estado rápido del sistema y rotación activa')">⚡ Estado rápido</button>
+    <button onclick="runChaosTest()">🧪 Simular Caída 503 + Rate-Limit 429</button>
+    <button onclick="quickAsk('Dame una idea out-of-the-box para optimizar agentes móviles')">💡 Idea Out-of-the-Box</button>
+  </div>
+
+  <footer id="chatFooter">
+    <select id="modeSel">
+      <option value="auto">Auto</option>
+      <option value="magi">MAGI</option>
+    </select>
+    <input id="chatIn" type="text" placeholder="Escribe a agent Bot..." autocomplete="off" />
+    <button class="primary" onclick="sendUserMsg(false)">Enviar</button>
+  </footer>
+
+  <!-- TAB 2: ROTATION MATRIX -->
+  <main id="viewRot" class="hidden">
+    <div class="stats-grid">
+      <div class="stat-box"><b id="stOk">0</b><span>Respuestas OK</span></div>
+      <div class="stat-box"><b id="stFailover">0</b><span>Saltos Failover</span></div>
+      <div class="stat-box"><b id="st429">0</b><span>429 / Caídas Evitadas</span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:4px;">
+      <button class="warn-btn" style="flex:1;" onclick="switchTab('chat');runChaosTest();">🧪 Inyectar 503+429 y Probar</button>
+      <button class="primary" onclick="resetAllBreakers()">🔄 Resetear</button>
+    </div>
+    <div id="provList" style="display:flex;flex-direction:column;gap:7px;"></div>
+  </main>
+
+  <!-- TAB 3: CONFIG -->
+  <main id="viewCfg" class="hidden">
+    <div class="field">
+      <label>Puente Malla #1 (Tailscale / LAN :8085)</label>
+      <input id="cfgBridge1" placeholder="http://100.85.79.17:8085/v1/chat/completions" />
+    </div>
+    <div class="field">
+      <label>Puente Malla #2 Respaldo (PC HP :8085)</label>
+      <input id="cfgBridge2" placeholder="http://100.119.206.121:8085/v1/chat/completions" />
+    </div>
+    <div class="field">
+      <label>Endpoint Tríada MAGI (:8898 /ritsuko/trialectica)</label>
+      <input id="cfgMagi" placeholder="http://100.85.79.17:8898/ritsuko/trialectica" />
+    </div>
+    <div class="field">
+      <label>Google Gemini API Key (4 cubetas independientes)</label>
+      <input id="cfgGemini" type="password" placeholder="Dejar vacío para conservar actual" />
+    </div>
+    <div class="field">
+      <label>Groq API Key (Opcional · LPU ultrarrápido)</label>
+      <input id="cfgGroq" type="password" placeholder="gsk_..." />
+    </div>
+    <div class="field">
+      <label>OpenRouter API Key (Opcional)</label>
+      <input id="cfgOr" type="password" placeholder="sk-or-..." />
+    </div>
+    <button class="primary" style="margin-top:6px;" onclick="saveCfg()">💾 Guardar y Reiniciar Disyuntores</button>
+    <p id="cfgMsg" style="font-size:11.5px;color:#4ade80;margin-top:6px;"></p>
+  </main>
+</div>
+
+<script>
+const historyMsgs = [
+  { role: "system", content: "Eres agent Bot OpenSource integrado a la arquitectura MAGI. Responde en español directo, útil y conciso." }
+];
+let reqSeq = 0;
+const pendingMap = {};
+
+function switchTab(t) {
+  document.getElementById("viewChat").classList.toggle("hidden", t !== "chat");
+  document.getElementById("quickChips").classList.toggle("hidden", t !== "chat");
+  document.getElementById("chatFooter").classList.toggle("hidden", t !== "chat");
+  document.getElementById("viewRot").classList.toggle("hidden", t !== "rot");
+  document.getElementById("viewCfg").classList.toggle("hidden", t !== "cfg");
+  document.getElementById("tabBtnChat").classList.toggle("active", t === "chat");
+  document.getElementById("tabBtnRot").classList.toggle("active", t === "rot");
+  document.getElementById("tabBtnCfg").classList.toggle("active", t === "cfg");
+  if (t === "rot") refreshSnapshot();
+  if (t === "cfg") loadCfgForm();
+}
+
+function appendBubble(role, text, metaHtml) {
+  const view = document.getElementById("viewChat");
+  const div = document.createElement("div");
+  div.className = "msg " + (role === "user" ? "user" : "bot");
+  div.textContent = text;
+  if (metaHtml) {
+    const m = document.createElement("div");
+    m.className = "meta-tag";
+    m.innerHTML = metaHtml;
+    div.appendChild(m);
+  }
+  view.appendChild(div);
+  view.scrollTop = view.scrollHeight;
+  return div;
+}
+
+function quickAsk(txt) {
+  document.getElementById("chatIn").value = txt;
+  sendUserMsg(false);
+}
+
+function runChaosTest() {
+  document.getElementById("chatIn").value = "Prueba de estrés: verifica que sobreviviste a caída 503 y rate-limit 429 rotando de proveedor.";
+  sendUserMsg(true);
+}
+
+function sendUserMsg(injectChaos) {
+  const input = document.getElementById("chatIn");
+  const text = (input.value || "").trim();
+  if (!text) return;
+  input.value = "";
+
+  appendBubble("user", (injectChaos ? "🧪 [CAOS 503+429] " : "") + text);
+  historyMsgs.push({ role: "user", content: text });
+  while (historyMsgs.length > 13) historyMsgs.splice(1, 2);
+
+  const waitEl = appendBubble("bot", injectChaos
+    ? "⏳ Inyectando 503 + 429 en los 2 primeros proveedores y rotando..."
+    : "⏳ Consultando anillo multi-proveedor...");
+
+  const id = ++reqSeq;
+  pendingMap[id] = waitEl;
+  const mode = document.getElementById("modeSel").value;
+
+  if (window.AgentBotNative && AgentBotNative.sendChat) {
+    AgentBotNative.sendChat(id, JSON.stringify({ messages: historyMsgs, mode }), !!injectChaos);
+  } else {
+    waitEl.textContent = "Puente nativo no detectado.";
+  }
+}
+
+window.__onAgentBotReply = function(reqId, rawJson) {
+  const el = pendingMap[reqId];
+  delete pendingMap[reqId];
+  if (!el) return;
+  try {
+    const res = JSON.parse(rawJson);
+    if (res.ok) {
+      historyMsgs.push({ role: "assistant", content: res.content });
+      el.textContent = res.content;
+      const trailArr = res.trail || [];
+      let meta = "<span>✅ " + res.providerName + " · " + res.latencyMs + " ms</span>";
+      if (res.failoverHops > 0) {
+        const hopsDesc = trailArr.map(s => s.providerId + "(" + (s.status || "ERR") + ")").join(" → ");
+        meta += "<span class='trail-tag'>⚡ Rotó tras " + res.failoverHops + " salto(s): " + hopsDesc + "</span>";
+      }
+      const m = document.createElement("div");
+      m.className = "meta-tag";
+      m.innerHTML = meta;
+      el.appendChild(m);
+      document.getElementById("topBadge").textContent = "🟢 " + res.providerId.split(":")[0];
+      document.getElementById("subStatus").textContent = "Último: " + res.providerName + " (" + res.latencyMs + " ms)";
+    } else {
+      el.textContent = "⚠️ " + (res.error || "Sin respuesta");
+    }
+  } catch (e) {
+    el.textContent = "Error parseando respuesta: " + e.message;
+  }
+  refreshSnapshot();
+};
+
+window.__renderAutoChaosProof = function(prompt, rawJson) {
+  appendBubble("user", "🧪 [AUTOPRUEBA CAOS 503+429] " + prompt);
+  const el = appendBubble("bot", "⏳ Verificando rotación...");
+  const fakeId = ++reqSeq;
+  pendingMap[fakeId] = el;
+  window.__onAgentBotReply(fakeId, rawJson);
+};
+
+function refreshSnapshot() {
+  if (!window.AgentBotNative || !AgentBotNative.getProvidersSnapshot) return;
+  try {
+    const snap = JSON.parse(AgentBotNative.getProvidersSnapshot());
+    const m = snap.metrics || {};
+    const list = snap.providers || [];
+    document.getElementById("provCount").textContent = list.length;
+    document.getElementById("stOk").textContent = m.totalSuccess || 0;
+    document.getElementById("stFailover").textContent = m.totalFailovers || 0;
+    document.getElementById("st429").textContent = (m.rateLimitsSurvived || 0) + (m.outagesSurvived || 0);
+
+    const box = document.getElementById("provList");
+    box.innerHTML = "";
+    list.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "prov-card";
+      const cd = p.cooldownSec > 0 ? (" · " + p.cooldownSec + "s") : "";
+      const errTxt = p.lastError ? (" · ⚠️ " + p.lastError) : "";
+      card.innerHTML =
+        "<div><h4>" + p.name + "</h4>" +
+        "<p>Tier " + p.tier + " · ~" + p.latencyMs + " ms · OK " + p.successes + "/" + p.calls + errTxt + "</p></div>" +
+        "<span class='badge " + p.status + "'>" + p.status + cd + "</span>";
+      box.appendChild(card);
+    });
+  } catch (_e) {}
+}
+
+function resetAllBreakers() {
+  if (window.AgentBotNative && AgentBotNative.resetBreakers) {
+    AgentBotNative.resetBreakers();
+    refreshSnapshot();
+  }
+}
+
+function loadCfgForm() {
+  if (!window.AgentBotNative || !AgentBotNative.getConfigMasked) return;
+  try {
+    const c = JSON.parse(AgentBotNative.getConfigMasked());
+    document.getElementById("cfgBridge1").value = c.bridge_url_1 || "";
+    document.getElementById("cfgBridge2").value = c.bridge_url_2 || "";
+    document.getElementById("cfgMagi").value = c.magi_url || "";
+    document.getElementById("cfgGemini").placeholder = c.has_gemini_key ? "✓ Llave Gemini activa (escribe para reemplazar)" : "AIza... / AQ...";
+    document.getElementById("cfgGroq").placeholder = c.has_groq_key ? "✓ Llave Groq activa" : "gsk_...";
+    document.getElementById("cfgOr").placeholder = c.has_openrouter_key ? "✓ Llave OpenRouter activa" : "sk-or-...";
+  } catch (_e) {}
+}
+
+function saveCfg() {
+  if (!window.AgentBotNative || !AgentBotNative.saveConfig) return;
+  const payload = {
+    bridge_url_1: document.getElementById("cfgBridge1").value,
+    bridge_url_2: document.getElementById("cfgBridge2").value,
+    magi_url: document.getElementById("cfgMagi").value,
+    gemini_key: document.getElementById("cfgGemini").value,
+    groq_key: document.getElementById("cfgGroq").value,
+    openrouter_key: document.getElementById("cfgOr").value,
+  };
+  AgentBotNative.saveConfig(JSON.stringify(payload));
+  document.getElementById("cfgGemini").value = "";
+  document.getElementById("cfgGroq").value = "";
+  document.getElementById("cfgOr").value = "";
+  document.getElementById("cfgMsg").textContent = "✅ Configuración guardada y anillo actualizado.";
+  refreshSnapshot();
+}
+
+window.__refreshFromNative = refreshSnapshot;
+document.getElementById("chatIn").addEventListener("keydown", e => { if (e.key === "Enter") sendUserMsg(false); });
+refreshSnapshot();
+</script>
+</body>
+</html>

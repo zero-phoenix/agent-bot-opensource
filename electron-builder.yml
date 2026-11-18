@@ -1,0 +1,34 @@
+appId: com.tabris.agentbot.opensource
+productName: agent Bot
+copyright: Open-Source Build Integrated with Tabris MAGI Core
+
+directories:
+  output: release
+
+asar: true
+npmRebuild: false
+nodeGypRebuild: false
+buildDependenciesFromSource: false
+
+files:
+  - "dist/**"
+  - "src/**"
+  - "mocks/**"
+  - "package.json"
+
+asarUnpack:
+  - "dist/deps/**"
+  - "dist/native/**"
+  - "**/*.node"
+  - "**/*.wasm"
+  - "**/*.exe"
+
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  signAndEditExecutable: false
+
+portable:
+  artifactName: "agent-Bot-${version}-portable.exe"
